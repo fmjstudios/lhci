@@ -13,14 +13,14 @@ set -o errexit -o nounset -o pipefail
 #   'help' usage function
 # ----------------------
 ctl_usage() {
-  echo
-  echo "Usage: $(basename "${0}") <COMMAND>"
-  echo
-  echo "init    - Initialize the Shopware instance"
-  echo "start   - Start the LHCI process"
-  echo "run     - Run LCHI"
-  echo "help    - Print this usage information"
-  echo
+	echo
+	echo "Usage: $(basename "${0}") <COMMAND>"
+	echo
+	echo "init    - Initialize the Shopware instance"
+	echo "start   - Start the LHCI process"
+	echo "run     - Run LCHI"
+	echo "help    - Print this usage information"
+	echo
 }
 
 # ----------------------
@@ -31,42 +31,42 @@ ctl_usage() {
 # Set up an SQLite database if it's configured, otherwise wait for a ready MySQL or PostgreSQL
 # connection
 ctl_init() {
-  init_database
+	init_database
 }
 
 # ----------------------
 #   'start' function
 # ----------------------
 ctl_start() {
-  npm start
+	npm start
 }
 
 # --------------------------------
 #   MAIN
 # --------------------------------
 main() {
-  cmd=${1}
+	cmd=${1}
 
-  case "${cmd}" in
-  init)
-    ctl_init
-    return $?
-    ;;
-  start)
-    ctl_start
-    return $?
-    ;;
-  run)
-    ctl_init
-    ctl_start
-    return $?
-    ;;
-  *)
-    log "Unknown command: ${cmd}. See 'help' command for usage information:"
-    hosts::usage
-    return 1
-    ;;
-  esac
+	case "${cmd}" in
+	init)
+		ctl_init
+		return $?
+		;;
+	start)
+		ctl_start
+		return $?
+		;;
+	run)
+		ctl_init
+		ctl_start
+		return $?
+		;;
+	*)
+		log "Unknown command: ${cmd}. See 'help' command for usage information:"
+		hosts::usage
+		return 1
+		;;
+	esac
 }
 
 # ------------

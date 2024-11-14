@@ -1,4 +1,3 @@
-#!/usr/bin/env sh
 # shellcheck shell=sh
 
 CWD="$(pwd)"
@@ -17,7 +16,7 @@ ROOT="${CWD}"
 #   executed file.
 #######################################
 log() {
-  echo "[$(date '+%d-%m-%Y_%T')] $(basename "${0}"): ${*}"
+	echo "[$(date '+%d-%m-%Y_%T')] $(basename "${0}"): ${*}"
 }
 
 #######################################
@@ -30,13 +29,13 @@ log() {
 #   0 if we are, 1 otherwise.
 #######################################
 ensure_project_root() {
-  # check if current dir
-  if [ ! -e "${ROOT}/package.json" ]; then
-    log "ERROR: script is not being executed from project root!"
-    return 1
-  fi
+	# check if current dir
+	if [ ! -e "${ROOT}/package.json" ]; then
+		log "ERROR: script is not being executed from project root!"
+		return 1
+	fi
 
-  return 0
+	return 0
 }
 
 #######################################
@@ -50,21 +49,21 @@ ensure_project_root() {
 #   1 if not.
 #######################################
 install_dependencies() {
-  ensure_project_root
+	ensure_project_root
 
-  # build args
-  args=""
-  if [ "${APP_ENV}" = "prod" ]; then args="${args} --omit=dev"; fi
+	# build args
+	args=""
+	if [ "${APP_ENV}" = "prod" ]; then args="${args} --omit=dev"; fi
 
-  # check if npm is installed
-  if [ "$(command -v npm)" ]; then
-    if ! npm install "${args}"; then
-      log "ERROR: Could not install LHCI dependencies"
-      return 1
-    fi
-  else
-    log "ERROR: Cannot install LHCI dependencies. 'npm' is not installed!"
-  fi
+	# check if npm is installed
+	if [ "$(command -v npm)" ]; then
+		if ! npm install "${args}"; then
+			log "ERROR: Could not install LHCI dependencies"
+			return 1
+		fi
+	else
+		log "ERROR: Cannot install LHCI dependencies. 'npm' is not installed!"
+	fi
 }
 
 #######################################
@@ -80,30 +79,30 @@ install_dependencies() {
 #   or coudln't be initialized.
 #######################################
 init_database() {
-  ensure_project_root
+	ensure_project_root
 
-  sql_dialect=$(yq '.ci.server.storage.sqlDialect' lighthouserc.yaml)
-  # SQLite
-  sql_path=$(yq '.ci.server.storage.sqlDatabasePath' lighthouserc.yaml)
-  # MySQl/PostgreSQL
-  sql_connection=$(yq '.ci.server.storage.sqlConnectionUrl' lighthouserc.yaml)
+	sql_dialect=$(yq '.ci.server.storage.sqlDialect' lighthouserc.yaml)
+	# SQLite
+	sql_path=$(yq '.ci.server.storage.sqlDatabasePath' lighthouserc.yaml)
+	# MySQl/PostgreSQL
+	sql_connection=$(yq '.ci.server.storage.sqlConnectionUrl' lighthouserc.yaml)
 
-  case ${sql_dialect} in
-  "sqlite")
-    log "Creating SQLite database"
-    sqlite3 "${sql_path}" <<EOF
+	case ${sql_dialect} in
+	"sqlite")
+		log "Creating SQLite database"
+		sqlite3 "${sql_path}" <<EOF
 .exit
 EOF
-    ;;
-  "postgres")
-    log "Watching for PostgreSQL database connection"
-    database_connection_check "${sql_connection}"
-    ;;
-  "mysql")
-    log "Watching for MySQL database connection"
-    database_connection_check "${sql_connection}"
-    ;;
-  esac
+		;;
+	"postgres")
+		log "Watching for PostgreSQL database connection"
+		database_connection_check "${sql_connection}"
+		;;
+	"mysql")
+		log "Watching for MySQL database connection"
+		database_connection_check "${sql_connection}"
+		;;
+	esac
 }
 
 #######################################
@@ -118,25 +117,25 @@ EOF
 #   Logs remaining seconds on each iteration.
 #######################################
 database_connection_check() {
-  database_url=${1}
+	database_url=${1}
 
-  echo "|--------------------------------------------------------------|"
-  echo "|      Checking for an active MySQL/PostgreSQL connection      |"
-  echo "|--------------------------------------------------------------|"
+	echo "|--------------------------------------------------------------|"
+	echo "|      Checking for an active MySQL/PostgreSQL connection      |"
+	echo "|--------------------------------------------------------------|"
 
-  # shellcheck disable=SC2086
-  database_host=${DATABASE_HOST:-"$(trurl "${database_url}" --get '{host}')"}
-  database_port=${DATABASE_PORT:-"$(trurl "${database_url}" --get '{port}')"}
-  tries=0
+	# shellcheck disable=SC2086
+	database_host=${DATABASE_HOST:-"$(trurl "${database_url}" --get '{host}')"}
+	database_port=${DATABASE_PORT:-"$(trurl "${database_url}" --get '{port}')"}
+	tries=0
 
-  until nc -z -w$((DATABASE_TIMEOUT + 20)) -v "$database_host" "${database_port:-3306}"; do
-    log "Waiting $((DATABASE_TIMEOUT - tries)) more seconds for database connection to become available"
-    sleep 1
-    tries=$((tries + 1))
+	until nc -z -w$((DATABASE_TIMEOUT + 20)) -v "$database_host" "${database_port:-3306}"; do
+		log "Waiting $((DATABASE_TIMEOUT - tries)) more seconds for database connection to become available"
+		sleep 1
+		tries=$((tries + 1))
 
-    if [ "$tries" -eq "${DATABASE_TIMEOUT}" ]; then
-      log "FATAL: Could not connect to database within timeout of ${tries} seconds. Exiting."
-      exit 1
-    fi
-  done
+		if [ "$tries" -eq "${DATABASE_TIMEOUT}" ]; then
+			log "FATAL: Could not connect to database within timeout of ${tries} seconds. Exiting."
+			exit 1
+		fi
+	done
 }

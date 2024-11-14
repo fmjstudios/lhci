@@ -18,7 +18,7 @@ ARG PORT=9001
 ARG USER=lhci
 
 # persistent / runtime deps
-# hadolint ignore=DL3008
+# hadolint ignore=DL3018
 RUN apk update && apk add --no-cache --update \
   python3=~3.12 \
   build-base=~0.5 \
@@ -41,6 +41,11 @@ EOF
 COPY --chmod=755 docker/bin/lhctl /usr/local/bin
 COPY --chmod=755 docker/bin/lhci /usr/local/bin
 COPY --chmod=644 docker/lib/utils.sh /usr/local/lib
+
+# add a healthcheck
+# ref: https://developer.shopware.com/docs/guides/hosting/installation-updates/cluster-setup.html#health-check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=5 \
+  CMD curl --fail "http://localhost:${PORT:-9001}/healthz" || exit 1
 
 # -------------------------------------
 # LHCI Builder Image
