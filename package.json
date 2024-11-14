@@ -1,0 +1,29 @@
+{
+  "name": "@fmjstudios/lhci",
+  "description": "A Lighthouse CI Server",
+  "version": "0.1.0",
+  "author": {
+    "name": "FMJdev",
+    "email": "info@fmj.dev",
+    "url": "https://fmj.dev"
+  },
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fmjstudios/lhci"
+  },
+  "keywords": [
+    "pnpm",
+    "lighthouse",
+    "unlighthouse",
+    "ci"
+  ],
+  "scripts": {
+    "start": "lhci server --config=./lighthouserc.yaml"
+  },
+  "dependencies": {
+    "@lhci/cli": "^0.14.0",
+    "@lhci/server": "^0.14.0",
+    "sqlite3": "^5.1.7"
+  }
+}

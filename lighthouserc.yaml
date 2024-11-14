@@ -1,0 +1,10 @@
+# Lighthouse CI configuration file
+# reference: https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/configuration.md
+
+ci:
+  server:
+    port: 9001
+    storage:
+      storageMethod: sql
+      sqlDialect: sqlite
+      sqlDatabasePath: /data/lhci.db
